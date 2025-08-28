@@ -1,0 +1,19 @@
+{
+  "name": "api-rest-js-tmdb",
+  "version": "1.0.0",
+  "description": "Consumo de APIde TMDB",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hermanxcxr/api-rest-JS-TMDB.git"
+  },
+  "author": "hermanxcxr",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hermanxcxr/api-rest-JS-TMDB/issues"
+  },
+  "homepage": "https://github.com/hermanxcxr/api-rest-JS-TMDB#readme"
+}
