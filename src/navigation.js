@@ -13,10 +13,6 @@ arrowBtn.addEventListener('click', () => {
 window.addEventListener('DOMContentLoaded', navigator, false); // Cuando el DOM esté listo 
 window.addEventListener('hashchange', navigator, false); // Cuando cambie el hash
 
-
-
-
-
 function navigator() {
     console.log({location});
     if (location.hash.startsWith('#trends')) {
@@ -111,6 +107,9 @@ function movieDetailsPage() {
     categoriesPreviewSection.classList.add('inactive');
     genericSection.classList.add('inactive');
     movieDetailSection.classList.remove('inactive');
+
+    const [_, movieId] = location.hash.split('='); // ['#movie', 'id']
+    getMovieById(movieId);
 }
 
 function categoryPage() {
