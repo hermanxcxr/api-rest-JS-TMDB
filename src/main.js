@@ -11,13 +11,10 @@ const api = axios.create({
 });
 
 
-async function getTrendingMoviesPreview() {
-  const { data } = await api(`/trending/movie/day?language=es`);  
+//Utils
+function movieList(section, movies) {
 
-  const movies = data.results;
-  //console.log({data, movies});
-
-  trendingMoviesPreviewList.innerHTML = '';
+  section.innerHTML = '';
 
   movies.forEach(movie => {
     
@@ -30,19 +27,14 @@ async function getTrendingMoviesPreview() {
     movieImg.setAttribute('src', `https://image.tmdb.org/t/p/w300${movie.poster_path}`);
 
     movieContainer.appendChild(movieImg);
-    trendingMoviesPreviewList.appendChild(movieContainer);
+    section.appendChild(movieContainer);
       
   });
 }
 
+function categoriesList(section, genres) {
 
-async function getCategoriesPreview() {
-  const { data }= await api(`genre/movie/list?language=es`);
-
-  const genres = data.genres;
-  //console.log({data, movies});
-
-  categoriesPreviewList.innerHTML = '';
+  section.innerHTML = '';
 
   genres.forEach(genre => {
     
@@ -51,12 +43,71 @@ async function getCategoriesPreview() {
 
     const categoryTitle = document.createElement('h3');
     categoryTitle.classList.add('category-title');
-    categoryTitle.setAttribute('id', 'id' + genre.id);    
+    categoryTitle.setAttribute('id', 'id' + genre.id);
+    categoryTitle.addEventListener('click', () => {
+      location.hash = `#category=${genre.id}-${genre.name}`;
+    });
     const categoryTitleText = document.createTextNode(genre.name);
     categoryTitle.appendChild(categoryTitleText);
 
     categoryContainer.appendChild(categoryTitle);
-    categoriesPreviewList.appendChild(categoryContainer);
+    section.appendChild(categoryContainer);
       
   });
+
+}
+
+
+//Llamados a la API
+async function getTrendingMoviesPreview() {
+  const { data } = await api(`/trending/movie/day?language=es`);  
+
+  const movies = data.results;
+
+  movieList(trendingMoviesPreviewList, movies)
+
+}
+
+
+async function getCategoriesPreview() {
+  const { data }= await api(`genre/movie/list?language=es`);
+
+  const genres = data.genres;
+  
+  categoriesList(categoriesPreviewList, genres);  
+}
+
+
+async function getMoviesByCategory(categoryId) {  
+  const { data } = await api('/discover/movie', {
+  params: {
+    language: 'es',
+    with_genres: categoryId
+    }
+  }); 
+
+  const movies = data.results;
+
+  movieList(genericSection, movies);
+}
+
+async function getMoviesBySearch(query) {
+  const { data } = await api('/search/movie', {
+    params: {
+      language: 'es',
+      query,
+    }
+  });
+  
+  const movies = data.results;
+  movieList(genericSection, movies);
+}
+
+async function getTrendingMovies() {
+  const { data } = await api(`/trending/movie/day?language=es`);  
+
+  const movies = data.results;
+
+  movieList(genericSection, movies)
+
 }
