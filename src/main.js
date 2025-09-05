@@ -9,7 +9,6 @@ const api = axios.create({
   params: {
   }
 });
-let page = 1;
 
 //Utils
 
@@ -130,32 +129,43 @@ async function getTrendingMovies() {
   const { data } = await api(`/trending/movie/day?language=es`);  
 
   const movies = data.results;
+  maxPage = data.total_pages;
 
   movieList(genericSection, movies,{lazyLoad : true, clean : true})
 
-  const btnLoadMore = document.createElement('button');
-  btnLoadMore.innerText = 'Cargar más';
-  btnLoadMore.addEventListener('click', getPaginatedTrendingMovies);
-  genericSection.appendChild(btnLoadMore);
+  // const btnLoadMore = document.createElement('button');
+  // btnLoadMore.innerText = 'Cargar más';
+  // btnLoadMore.addEventListener('click', getPaginatedTrendingMovies);
+  // genericSection.appendChild(btnLoadMore);
 
 }
 
 async function getPaginatedTrendingMovies() {
-  const { data } = await api(`/trending/movie/day`,
+
+  const {scrollTop, scrollHeight, clientHeight} = document.documentElement;
+
+  const scrollIsBottom = scrollTop + clientHeight >= scrollHeight - 15
+
+  const pageIsNotMax = page < maxPage
+
+  if (scrollIsBottom && pageIsNotMax) {
+    page++;
+    const { data } = await api(`/trending/movie/day`,
       { params: {
           language: 'es',
-          page: page++,
+          page
         }
     });  
 
-  const movies = data.results;
+    const movies = data.results;
 
-  movieList(genericSection, movies, {lazyLoad : true, clean : false})
+    movieList(genericSection, movies, {lazyLoad : true, clean : false})
+  }
 
-  const btnLoadMore = document.createElement('button');
-  btnLoadMore.innerText = 'Cargar más';
-  btnLoadMore.addEventListener('click', getPaginatedTrendingMovies);
-  genericSection.appendChild(btnLoadMore);
+  // const btnLoadMore = document.createElement('button');
+  // btnLoadMore.innerText = 'Cargar más';
+  // btnLoadMore.addEventListener('click', getPaginatedTrendingMovies);
+  // genericSection.appendChild(btnLoadMore);
 
 }
 
