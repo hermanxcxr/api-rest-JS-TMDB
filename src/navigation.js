@@ -106,6 +106,8 @@ function searchPage() {
 
     const [_, searchValue] = location.hash.split('='); // ['#search', 'búsqueda']
     getMoviesBySearch(searchValue);
+
+    infiniteScroll = getPaginatedMoviesBySearch(searchValue);
 }
 
 function movieDetailsPage() {
@@ -150,4 +152,6 @@ function categoryPage() {
     headerCategoryTitle.innerHTML = decodeURIComponent(categoryName);
 
     getMoviesByCategory(categoryId);
+
+    infiniteScroll = getPaginatedMoviesByCategory(categoryId);
 }

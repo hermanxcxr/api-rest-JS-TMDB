@@ -87,7 +87,6 @@ async function getTrendingMoviesPreview() {
   const movies = data.results;
 
   movieList(trendingMoviesPreviewList, movies, {lazyLoad : true, clean : true})
-
 }
 
 
@@ -109,9 +108,36 @@ async function getMoviesByCategory(categoryId) {
   }); 
 
   const movies = data.results;
+  maxPage = data.total_pages;
 
-  movieList(genericSection, movies,  {lazyLoad : true, clean : true});
+  movieList(genericSection, movies,  {lazyLoad : true});
 }
+
+function getPaginatedMoviesByCategory(categoryId) {
+  return async function () {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+    const scrollIsBottom = scrollTop + clientHeight >= scrollHeight - 15;
+
+    const pageIsNotMax = page < maxPage;
+
+    if (scrollIsBottom && pageIsNotMax) {
+      page++;
+      const { data } = await api(`/discover/movie`, {
+        params: {
+          language: "es",
+          with_genres: categoryId,
+          page,
+        },
+      });
+
+      const movies = data.results;
+
+      movieList(genericSection, movies, { lazyLoad: true, clean: false });
+    }
+  };
+}
+
 
 async function getMoviesBySearch(query) {
   const { data } = await api('/search/movie', {
@@ -122,8 +148,36 @@ async function getMoviesBySearch(query) {
   });
   
   const movies = data.results;
-  movieList(genericSection, movies);
+  maxPage = data.total_pages;
+  console.log(maxPage);
+  movieList(genericSection, movies,{ lazyLoad: true, clean: true });
 }
+
+function getPaginatedMoviesBySearch(query) {
+  return async function () {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+    const scrollIsBottom = scrollTop + clientHeight >= scrollHeight - 15;
+
+    const pageIsNotMax = page < maxPage;
+
+    if (scrollIsBottom && pageIsNotMax) {
+      page++;
+      const { data } = await api(`/search/movie`, {
+        params: {
+          language: "es",
+          query,
+          page,
+        },
+      });
+
+      const movies = data.results;
+
+      movieList(genericSection, movies, { lazyLoad: true, clean: false });
+    }
+  };
+}
+
 
 async function getTrendingMovies() {
   const { data } = await api(`/trending/movie/day?language=es`);  
