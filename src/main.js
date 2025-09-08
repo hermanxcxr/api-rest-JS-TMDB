@@ -10,6 +10,32 @@ const api = axios.create({
   }
 });
 
+function likedMoviesList() {
+  const item = localStorage.getItem('liked_movies');
+  let movies;
+  if (item) {
+    movies = JSON.parse(item);
+  } else {
+    movies = {};
+  }  
+  return movies;
+}
+
+function likeMovie(movie) {
+  const liked_movies = likedMoviesList();
+
+  if (liked_movies[movie.id]) {
+    // Si la película ya está en favoritos, la eliminamos
+    delete liked_movies[movie.id];
+  } else {
+    // Si la película no está en favoritos, la añadimos
+    liked_movies[movie.id] = movie;
+  }
+  
+  localStorage.setItem('liked_movies', JSON.stringify(liked_movies));
+  getLikedMovies();
+}
+
 //Utils
 
 const lazyLoader = new IntersectionObserver((entries) => {
@@ -31,17 +57,26 @@ function movieList(section, movies, { lazyLoad=false, clean=true }) {
     
     const movieContainer = document.createElement('div');
     movieContainer.classList.add('movie-container');
-    movieContainer.addEventListener('click', () => {
-      location.hash = `#movie=${movie.id}`;
-    });
+    // movieContainer.addEventListener('click', () => {
+    //   location.hash = `#movie=${movie.id}`;
+    // });
 
     const movieImg = document.createElement('img');
     movieImg.classList.add('movie-img');
     movieImg.setAttribute('alt', movie.title);
     //movieImg.setAttribute('src', `https://image.tmdb.org/t/p/w300${movie.poster_path}`);
     movieImg.setAttribute( lazyLoad ? 'data-img' : 'src' , `https://image.tmdb.org/t/p/w300${movie.poster_path}`);
+    movieImg.addEventListener('click', () => {location.hash = '#movie=' + movie.id;});
     movieImg.addEventListener('error', () => {
       movieImg.setAttribute('src', 'static/images/img404.png');
+    });
+
+    const movieBtn = document.createElement('button');
+    movieBtn.classList.add('movie-btn');    
+    likedMoviesList()[movie.id] && movieBtn.classList.add('movie-btn--liked');    
+    movieBtn.addEventListener('click', () => {
+      movieBtn.classList.toggle('movie-btn--liked');
+      likeMovie(movie);
     });
 
     if (lazyLoad) {
@@ -49,6 +84,7 @@ function movieList(section, movies, { lazyLoad=false, clean=true }) {
     }
 
     movieContainer.appendChild(movieImg);
+    movieContainer.appendChild(movieBtn);
     section.appendChild(movieContainer);
       
   });
@@ -255,5 +291,12 @@ async function getRelatedMoviesById(movieId) {
 
   const movies = data.results;  
 
-  movieList(relatedMoviesContainer, movies);
+  movieList(relatedMoviesContainer, movies,{ lazyLoad: true, clean: true });
+}
+
+//función para consumir el localStorage y mostrar las películas favoritas
+function getLikedMovies() {
+  const likedMovies = likedMoviesList();
+  const moviesArray = Object.values(likedMovies); // Convierte el objeto en un array
+  movieList(likedMoviesContainer, moviesArray, { lazyLoad: true, clean: true });
 }
